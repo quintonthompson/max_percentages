@@ -8,9 +8,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeorm_1 = require("typeorm");
 const User_1 = require("./entities/User");
+const express_1 = __importDefault(require("express"));
+const apollo_server_express_1 = require("apollo-server-express");
+const type_graphql_1 = require("type-graphql");
+const UserResolver_1 = require("./resolvers/UserResolver");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("here ");
     yield typeorm_1.createConnection({
@@ -19,8 +26,23 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         logging: true,
         synchronize: true,
         entities: [User_1.User],
-    }).catch((e) => {
-        console.log("error: ", e);
+    });
+    const app = express_1.default();
+    const server = new apollo_server_express_1.ApolloServer({
+        schema: yield type_graphql_1.buildSchema({
+            resolvers: [UserResolver_1.UserResolver],
+            validate: false,
+        }),
+        context: ({ req, res }) => ({
+            req,
+            res,
+        }),
+    });
+    server.applyMiddleware({
+        app,
+    });
+    app.listen(4000, () => {
+        console.log("listening on port 4000");
     });
 });
 main().catch((e) => {

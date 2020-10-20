@@ -1,5 +1,9 @@
 import { createConnection } from "typeorm";
 import { User } from "./entities/User";
+import express from "express";
+import { ApolloServer } from "apollo-server-express";
+import { buildSchema } from "type-graphql";
+import { UserResolver } from "./resolvers/UserResolver";
 
 const main = async () => {
   console.log("here ");
@@ -9,8 +13,27 @@ const main = async () => {
     logging: true,
     synchronize: true,
     entities: [User],
-  }).catch((e) => {
-    console.log("error: ", e);
+  });
+
+  const app = express();
+
+  const server = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [UserResolver],
+      validate: false,
+    }),
+    context: ({ req, res }) => ({
+      req,
+      res,
+    }),
+  });
+
+  server.applyMiddleware({
+    app,
+  });
+
+  app.listen(4000, () => {
+    console.log("listening on port 4000");
   });
 };
 
