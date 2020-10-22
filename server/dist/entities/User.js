@@ -21,14 +21,19 @@ __decorate([
 ], User.prototype, "id", void 0);
 __decorate([
     type_graphql_1.Field(),
-    typeorm_1.Column(),
+    typeorm_1.Column({ unique: true }),
     __metadata("design:type", String)
-], User.prototype, "firstName", void 0);
+], User.prototype, "username", void 0);
 __decorate([
     type_graphql_1.Field(),
     typeorm_1.Column(),
     __metadata("design:type", String)
-], User.prototype, "lastName", void 0);
+], User.prototype, "firstname", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    typeorm_1.Column(),
+    __metadata("design:type", String)
+], User.prototype, "lastname", void 0);
 __decorate([
     type_graphql_1.Field(),
     typeorm_1.Column(),

@@ -6,7 +6,6 @@ import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/UserResolver";
 
 const main = async () => {
-  console.log("here ");
   await createConnection({
     type: "postgres",
     database: "maxpercentages",
@@ -14,6 +13,8 @@ const main = async () => {
     synchronize: true,
     entities: [User],
   });
+
+  // await User.delete({});
 
   const app = express();
 

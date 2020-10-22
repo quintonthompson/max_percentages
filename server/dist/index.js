@@ -19,7 +19,6 @@ const apollo_server_express_1 = require("apollo-server-express");
 const type_graphql_1 = require("type-graphql");
 const UserResolver_1 = require("./resolvers/UserResolver");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("here ");
     yield typeorm_1.createConnection({
         type: "postgres",
         database: "maxpercentages",

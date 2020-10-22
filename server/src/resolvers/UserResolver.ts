@@ -1,4 +1,5 @@
 import { User } from "../entities/User";
+import "reflect-metadata";
 import {
   Arg,
   Ctx,
@@ -9,24 +10,8 @@ import {
   Query,
   Resolver,
 } from "type-graphql";
+import argon2 from "argon2";
 import { MyContext } from "src/types";
-
-@ObjectType()
-class FieldError {
-  @Field()
-  fieldId: string;
-
-  @Field()
-  messge: string;
-}
-@ObjectType()
-class UserResponse {
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
-
-  @Field(() => User, { nullable: true })
-  user?: User;
-}
 
 @Resolver()
 export class UserResolver {
@@ -40,13 +25,24 @@ export class UserResolver {
     return await User.findOne(id);
   }
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => User)
   async register(
-    @Arg("firstName") firstName: String,
-    @Arg("lastName") lastName: String,
-    @Arg("email") email: String,
-    @Arg("password") password: String
+    @Arg("username") userName: string,
+    @Arg("firstname") firstName: string,
+    @Arg("lastname") lastName: string,
+    @Arg("email") email: string,
+    @Arg("password") password: string
   ) {
-    // const user = User.create(User, {});
+    const hashedPassword = await argon2.hash(password);
+
+    const user = await User.create({
+      username: userName,
+      firstname: firstName,
+      lastname: lastName,
+      email: email,
+      password: hashedPassword,
+    }).save();
+
+    return user;
   }
 }

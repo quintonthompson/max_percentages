@@ -1,4 +1,4 @@
-export type MyContext {
-    req: Request,
-    res: Response
-}
+export type MyContext = {
+  req: Request;
+  res: Response;
+};

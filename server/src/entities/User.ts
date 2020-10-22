@@ -16,12 +16,16 @@ export class User extends BaseEntity {
   id: number;
 
   @Field()
-  @Column()
-  firstName: string;
+  @Column({ unique: true })
+  username: string;
 
   @Field()
   @Column()
-  lastName: string;
+  firstname: string;
+
+  @Field()
+  @Column()
+  lastname: string;
 
   @Field()
   @Column()
