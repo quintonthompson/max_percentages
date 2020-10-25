@@ -8,13 +8,76 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MaxCardResolver = void 0;
-const MaxCard_1 = require("src/entities/MaxCard");
+const MaxCard_1 = require("../entities/MaxCard");
 const type_graphql_1 = require("type-graphql");
+let MaxCardInput = class MaxCardInput {
+};
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], MaxCardInput.prototype, "firstName", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], MaxCardInput.prototype, "lastName", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxBench", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxSquat", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxPowerClean", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxSnatch", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxSumo", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxOverheadPress", void 0);
+__decorate([
+    type_graphql_1.Field({ nullable: true }),
+    __metadata("design:type", Number)
+], MaxCardInput.prototype, "maxJerk", void 0);
+MaxCardInput = __decorate([
+    type_graphql_1.InputType()
+], MaxCardInput);
 let MaxCardResolver = class MaxCardResolver {
     maxCards() {
-        return MaxCard_1.MaxCard.find();
+        return __awaiter(this, void 0, void 0, function* () {
+            const maxCards = yield MaxCard_1.MaxCard.find();
+            console.log("maxCards: ", maxCards);
+            return maxCards;
+        });
+    }
+    createMaxCard(options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const maxCard = yield MaxCard_1.MaxCard.create(options).save();
+            return maxCard;
+        });
     }
 };
 __decorate([
@@ -23,6 +86,13 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], MaxCardResolver.prototype, "maxCards", null);
+__decorate([
+    type_graphql_1.Mutation(() => MaxCard_1.MaxCard),
+    __param(0, type_graphql_1.Arg("options")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [MaxCardInput]),
+    __metadata("design:returntype", Promise)
+], MaxCardResolver.prototype, "createMaxCard", null);
 MaxCardResolver = __decorate([
     type_graphql_1.Resolver()
 ], MaxCardResolver);

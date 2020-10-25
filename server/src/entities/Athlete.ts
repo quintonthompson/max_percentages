@@ -1,18 +1,22 @@
-import {
-  BaseEntity,
-  Entity,
-  JoinColumn,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from "typeorm";
-import { MaxCard } from "./MaxCard";
+import { Field, ObjectType } from "type-graphql";
+import "reflect-metadata";
+import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
+@ObjectType()
 export class Athlete extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne((type) => MaxCard)
-  @JoinColumn()
-  maxCard: MaxCard;
+  @Column()
+  @Field()
+  firstname: string;
+
+  @Column()
+  @Field()
+  lastname: string;
+
+  // @OneToOne((type) => MaxCard)
+  // @JoinColumn()
+  // maxCard: MaxCard;
 }

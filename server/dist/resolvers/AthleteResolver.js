@@ -8,6 +8,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -21,10 +24,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AthleteResolver = void 0;
 const Athlete_1 = require("../entities/Athlete");
 const type_graphql_1 = require("type-graphql");
+require("reflect-metadata");
 let AthleteResolver = class AthleteResolver {
     athletes() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield Athlete_1.Athlete.find();
+        });
+    }
+    createAthlete(firstname, lastname) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const athlete = yield Athlete_1.Athlete.create({
+                firstname: firstname,
+                lastname: lastname,
+            }).save();
+            console.log("athlete: ", athlete);
+            return athlete;
         });
     }
 };
@@ -34,6 +48,14 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
 ], AthleteResolver.prototype, "athletes", null);
+__decorate([
+    type_graphql_1.Mutation(() => Athlete_1.Athlete),
+    __param(0, type_graphql_1.Arg("firstname")),
+    __param(1, type_graphql_1.Arg("lastname")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", Promise)
+], AthleteResolver.prototype, "createAthlete", null);
 AthleteResolver = __decorate([
     type_graphql_1.Resolver()
 ], AthleteResolver);

@@ -10,8 +10,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Athlete = void 0;
+const type_graphql_1 = require("type-graphql");
+require("reflect-metadata");
 const typeorm_1 = require("typeorm");
-const MaxCard_1 = require("./MaxCard");
 let Athlete = class Athlete extends typeorm_1.BaseEntity {
 };
 __decorate([
@@ -19,12 +20,18 @@ __decorate([
     __metadata("design:type", Number)
 ], Athlete.prototype, "id", void 0);
 __decorate([
-    typeorm_1.OneToOne((type) => MaxCard_1.MaxCard),
-    typeorm_1.JoinColumn(),
-    __metadata("design:type", MaxCard_1.MaxCard)
-], Athlete.prototype, "maxCard", void 0);
+    typeorm_1.Column(),
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Athlete.prototype, "firstname", void 0);
+__decorate([
+    typeorm_1.Column(),
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], Athlete.prototype, "lastname", void 0);
 Athlete = __decorate([
-    typeorm_1.Entity()
+    typeorm_1.Entity(),
+    type_graphql_1.ObjectType()
 ], Athlete);
 exports.Athlete = Athlete;
 //# sourceMappingURL=Athlete.js.map

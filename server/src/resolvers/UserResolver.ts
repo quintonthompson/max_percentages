@@ -11,10 +11,12 @@ import {
   Resolver,
 } from "type-graphql";
 import argon2 from "argon2";
-import { MyContext } from "src/types";
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User)
+  async me() {}
+
   @Query(() => [User])
   async users(): Promise<User[]> {
     return await User.find();

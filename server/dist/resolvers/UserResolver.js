@@ -30,6 +30,9 @@ require("reflect-metadata");
 const type_graphql_1 = require("type-graphql");
 const argon2_1 = __importDefault(require("argon2"));
 let UserResolver = class UserResolver {
+    me() {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
     users() {
         return __awaiter(this, void 0, void 0, function* () {
             return yield User_1.User.find();
@@ -54,6 +57,12 @@ let UserResolver = class UserResolver {
         });
     }
 };
+__decorate([
+    type_graphql_1.Query(() => User_1.User),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "me", null);
 __decorate([
     type_graphql_1.Query(() => [User_1.User]),
     __metadata("design:type", Function),

@@ -4,7 +4,11 @@
     "port": 5432,
     "username": "postgres",
     "password": "postgres",
-    "database": "lireddit3",
+    "database": "maxpercentages",
     "entities": ["dist/entities/*.js"],
-    "migrations": ["dist/migrations/*.js"]
+    "migrationsTableName": "migrations",
+    "migrations": ["dist/migrations/*.js"],
+    "cli": {
+        "migrationsDir": "migrations"
+    }
 }
