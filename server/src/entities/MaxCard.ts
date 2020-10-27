@@ -11,6 +11,7 @@ import {
 @Entity()
 export class MaxCard extends BaseEntity {
   @PrimaryGeneratedColumn()
+  @Field()
   id!: number;
 
   // @Field()

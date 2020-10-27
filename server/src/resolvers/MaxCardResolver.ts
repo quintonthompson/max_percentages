@@ -1,5 +1,6 @@
 import { MaxCard } from "../entities/MaxCard";
 import { Query, Resolver, InputType, Field, Mutation, Arg } from "type-graphql";
+import { Max } from "class-validator";
 
 @InputType()
 class MaxCardInput {
@@ -44,5 +45,12 @@ export class MaxCardResolver {
   async createMaxCard(@Arg("options") options: MaxCardInput): Promise<MaxCard> {
     const maxCard = await MaxCard.create(options).save();
     return maxCard;
+  }
+
+  @Mutation(() => Boolean)
+  async deleteMaxCard(@Arg("id") id: number) {
+    const result = await MaxCard.delete({ id });
+    console.log("result: ", result);
+    return true;
   }
 }

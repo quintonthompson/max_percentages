@@ -79,6 +79,13 @@ let MaxCardResolver = class MaxCardResolver {
             return maxCard;
         });
     }
+    deleteMaxCard(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield MaxCard_1.MaxCard.delete({ id });
+            console.log("result: ", result);
+            return true;
+        });
+    }
 };
 __decorate([
     type_graphql_1.Query(() => [MaxCard_1.MaxCard]),
@@ -93,6 +100,13 @@ __decorate([
     __metadata("design:paramtypes", [MaxCardInput]),
     __metadata("design:returntype", Promise)
 ], MaxCardResolver.prototype, "createMaxCard", null);
+__decorate([
+    type_graphql_1.Mutation(() => Boolean),
+    __param(0, type_graphql_1.Arg("id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], MaxCardResolver.prototype, "deleteMaxCard", null);
 MaxCardResolver = __decorate([
     type_graphql_1.Resolver()
 ], MaxCardResolver);

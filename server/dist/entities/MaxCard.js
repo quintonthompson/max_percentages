@@ -16,6 +16,7 @@ let MaxCard = class MaxCard extends typeorm_1.BaseEntity {
 };
 __decorate([
     typeorm_1.PrimaryGeneratedColumn(),
+    type_graphql_1.Field(),
     __metadata("design:type", Number)
 ], MaxCard.prototype, "id", void 0);
 __decorate([
