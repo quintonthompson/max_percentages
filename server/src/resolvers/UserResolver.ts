@@ -2,6 +2,7 @@ import { User } from "../entities/User";
 import "reflect-metadata";
 import {
   Arg,
+  Ctx,
   Field,
   InputType,
   Int,
@@ -11,6 +12,8 @@ import {
   Resolver,
 } from "type-graphql";
 import argon2 from "argon2";
+import { contains } from "class-validator";
+import { MyContext } from "src/types";
 
 @ObjectType()
 class FieldError {
@@ -40,7 +43,10 @@ class UserLoginInput {
 @InputType()
 class UserRegistrationInput {
   @Field()
-  userLoginInput: UserLoginInput;
+  username: string;
+
+  @Field()
+  password: string;
 
   @Field()
   firstname: string;
@@ -55,7 +61,13 @@ class UserRegistrationInput {
 @Resolver()
 export class UserResolver {
   @Query(() => User)
-  async me() {}
+  async me(@Ctx() { req }: MyContext) {
+    if (!req.session.userId) {
+      return null;
+    }
+    const user = User.findOne({ id: req.session.userId });
+    return user;
+  }
 
   @Query(() => [User])
   async users(): Promise<User[]> {
@@ -65,14 +77,15 @@ export class UserResolver {
   @Mutation(() => Boolean)
   async deleteUser(@Arg("id") id: number): Promise<Boolean> {
     const result = await User.delete({ id });
-    console.log("result: ", result);
     return true;
   }
 
   @Mutation(() => UserResponse)
-  async login(@Arg("options") options: UserLoginInput): Promise<UserResponse> {
+  async login(
+    @Arg("options") options: UserLoginInput,
+    @Ctx() { req }: MyContext
+  ): Promise<UserResponse> {
     const user = await User.findOne({ username: options.username });
-    console.log("user: ", user);
     if (!user) {
       return {
         errors: [
@@ -85,7 +98,6 @@ export class UserResolver {
     }
 
     const valid = await argon2.verify(user.password, options.password);
-    console.log("valid: ", valid);
     if (!valid) {
       return {
         errors: [
@@ -97,6 +109,9 @@ export class UserResolver {
       };
     }
 
+    req.session.userId = user.id;
+
+    console.log("userId: ", req.session!.userId);
     return {
       user,
     };
@@ -105,7 +120,6 @@ export class UserResolver {
   @Query(() => UserResponse)
   async findUser(@Arg("id", () => Int) id: number): Promise<UserResponse> {
     const user = await User.findOne({ id: id });
-    console.log("user: ", user);
     if (!user) {
       return {
         errors: [
@@ -121,18 +135,66 @@ export class UserResolver {
     };
   }
 
-  @Mutation(() => User)
-  async register(@Arg("options") options: UserRegistrationInput) {
-    const hashedPassword = await argon2.hash(options.userLoginInput.password);
+  @Mutation(() => UserResponse)
+  async register(
+    @Arg("options") options: UserRegistrationInput,
+    @Ctx() { req }: MyContext
+  ): Promise<UserResponse> {
+    if (options.username.length <= 2) {
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "length must be greater than 2",
+          },
+        ],
+      };
+    }
+    const hashedPassword = await argon2.hash(options.password);
 
-    const user = await User.create({
-      username: options.userLoginInput.username,
-      firstname: options.firstname,
-      lastname: options.lastname,
-      email: options.email,
-      password: hashedPassword,
-    }).save();
+    try {
+      const user = await User.create({
+        username: options.username,
+        firstname: options.firstname,
+        lastname: options.lastname,
+        email: options.email,
+        password: hashedPassword,
+      }).save();
 
-    return user;
+      req.session.userId = user.id;
+
+      return { user };
+    } catch (e) {
+      if (e.code === "23505" && e.detail.includes("email")) {
+        return {
+          errors: [
+            {
+              field: "password",
+              message: "user with email already exists",
+            },
+          ],
+        };
+      }
+
+      if (e.code === "23505") {
+        return {
+          errors: [
+            {
+              field: "password",
+              message: "user already exists",
+            },
+          ],
+        };
+      }
+
+      return {
+        errors: [
+          {
+            field: "username",
+            message: "something went wrong",
+          },
+        ],
+      };
+    }
   }
 }

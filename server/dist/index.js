@@ -24,6 +24,7 @@ const connect_redis_1 = __importDefault(require("connect-redis"));
 const path_1 = __importDefault(require("path"));
 const MaxCard_1 = require("./entities/MaxCard");
 const MaxCardResolver_1 = require("./resolvers/MaxCardResolver");
+const contants_1 = require("./contants");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const conn = yield typeorm_1.createConnection({
         type: "postgres",
@@ -42,11 +43,18 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const redisClient = redis_1.default.createClient();
     app.set("trust proxy", 1);
     app.use(express_session_1.default({
+        name: "qid",
         secret: "alnvvoaiuerjavalja",
         store: new redisStore({
             client: redisClient,
             disableTouch: true,
         }),
+        cookie: {
+            maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
+            httpOnly: true,
+            sameSite: "lax",
+            secure: contants_1.__prod__,
+        },
         saveUninitialized: false,
         resave: false,
     }));

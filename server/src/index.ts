@@ -12,6 +12,7 @@ import { AthleteResolver } from "./resolvers/AthleteResolver";
 import { Athlete } from "./entities/Athlete";
 import { MaxCard } from "./entities/MaxCard";
 import { MaxCardResolver } from "./resolvers/MaxCardResolver";
+import { __prod__ } from "./contants";
 
 const main = async () => {
   const conn = await createConnection({
@@ -38,11 +39,18 @@ const main = async () => {
   app.set("trust proxy", 1);
   app.use(
     session({
+      name: "qid",
       secret: "alnvvoaiuerjavalja",
       store: new redisStore({
         client: redisClient,
         disableTouch: true,
       }),
+      cookie: {
+        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, //10 years
+        httpOnly: true,
+        sameSite: "lax",
+        secure: __prod__,
+      },
       saveUninitialized: false,
       resave: false,
     })

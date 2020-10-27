@@ -72,8 +72,12 @@ let UserRegistrationInput = class UserRegistrationInput {
 };
 __decorate([
     type_graphql_1.Field(),
-    __metadata("design:type", UserLoginInput)
-], UserRegistrationInput.prototype, "userLoginInput", void 0);
+    __metadata("design:type", String)
+], UserRegistrationInput.prototype, "username", void 0);
+__decorate([
+    type_graphql_1.Field(),
+    __metadata("design:type", String)
+], UserRegistrationInput.prototype, "password", void 0);
 __decorate([
     type_graphql_1.Field(),
     __metadata("design:type", String)
@@ -90,8 +94,14 @@ UserRegistrationInput = __decorate([
     type_graphql_1.InputType()
 ], UserRegistrationInput);
 let UserResolver = class UserResolver {
-    me() {
-        return __awaiter(this, void 0, void 0, function* () { });
+    me({ req }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!req.session.userId) {
+                return null;
+            }
+            const user = User_1.User.findOne({ id: req.session.userId });
+            return user;
+        });
     }
     users() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -101,14 +111,12 @@ let UserResolver = class UserResolver {
     deleteUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield User_1.User.delete({ id });
-            console.log("result: ", result);
             return true;
         });
     }
-    login(options) {
+    login(options, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne({ username: options.username });
-            console.log("user: ", user);
             if (!user) {
                 return {
                     errors: [
@@ -120,7 +128,6 @@ let UserResolver = class UserResolver {
                 };
             }
             const valid = yield argon2_1.default.verify(user.password, options.password);
-            console.log("valid: ", valid);
             if (!valid) {
                 return {
                     errors: [
@@ -131,6 +138,8 @@ let UserResolver = class UserResolver {
                     ],
                 };
             }
+            req.session.userId = user.id;
+            console.log("userId: ", req.session.userId);
             return {
                 user,
             };
@@ -139,7 +148,6 @@ let UserResolver = class UserResolver {
     findUser(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const user = yield User_1.User.findOne({ id: id });
-            console.log("user: ", user);
             if (!user) {
                 return {
                     errors: [
@@ -155,24 +163,68 @@ let UserResolver = class UserResolver {
             };
         });
     }
-    register(options) {
+    register(options, { req }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const hashedPassword = yield argon2_1.default.hash(options.userLoginInput.password);
-            const user = yield User_1.User.create({
-                username: options.userLoginInput.username,
-                firstname: options.firstname,
-                lastname: options.lastname,
-                email: options.email,
-                password: hashedPassword,
-            }).save();
-            return user;
+            if (options.username.length <= 2) {
+                return {
+                    errors: [
+                        {
+                            field: "username",
+                            message: "length must be greater than 2",
+                        },
+                    ],
+                };
+            }
+            const hashedPassword = yield argon2_1.default.hash(options.password);
+            try {
+                const user = yield User_1.User.create({
+                    username: options.username,
+                    firstname: options.firstname,
+                    lastname: options.lastname,
+                    email: options.email,
+                    password: hashedPassword,
+                }).save();
+                req.session.userId = user.id;
+                return { user };
+            }
+            catch (e) {
+                if (e.code === "23505" && e.detail.includes("email")) {
+                    return {
+                        errors: [
+                            {
+                                field: "password",
+                                message: "user with email already exists",
+                            },
+                        ],
+                    };
+                }
+                if (e.code === "23505") {
+                    return {
+                        errors: [
+                            {
+                                field: "password",
+                                message: "user already exists",
+                            },
+                        ],
+                    };
+                }
+                return {
+                    errors: [
+                        {
+                            field: "username",
+                            message: "something went wrong",
+                        },
+                    ],
+                };
+            }
         });
     }
 };
 __decorate([
     type_graphql_1.Query(() => User_1.User),
+    __param(0, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "me", null);
 __decorate([
@@ -191,8 +243,9 @@ __decorate([
 __decorate([
     type_graphql_1.Mutation(() => UserResponse),
     __param(0, type_graphql_1.Arg("options")),
+    __param(1, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UserLoginInput]),
+    __metadata("design:paramtypes", [UserLoginInput, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "login", null);
 __decorate([
@@ -203,10 +256,11 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "findUser", null);
 __decorate([
-    type_graphql_1.Mutation(() => User_1.User),
+    type_graphql_1.Mutation(() => UserResponse),
     __param(0, type_graphql_1.Arg("options")),
+    __param(1, type_graphql_1.Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [UserRegistrationInput]),
+    __metadata("design:paramtypes", [UserRegistrationInput, Object]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
 UserResolver = __decorate([
